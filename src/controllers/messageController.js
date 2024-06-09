@@ -1,9 +1,18 @@
 const Message = require("../database/models/Message");
+const Car = require("../database/models/Car");
 const messageSchema = require("../validation/messageValidation");
 
 const limit = 50;
 
 const createMessage = async (req, res) => {
+    const { id } = req.params;
+
+    const car = await Car.findById(id);
+
+    if(!car) {
+        return res.status(400).send({ state: 'failed', message: 'This car doesnot exist' });
+    }
+
     const { start, end, name, phone } = req.body;
 
     const data = { start, end, name, phone }
@@ -15,7 +24,7 @@ const createMessage = async (req, res) => {
     }
 
     try {
-        await Message.create(data);
+        await Message.create({ start, end, name, phone, car_id: id });
 
         return res.status(200).send({ state: 'success', message: 'Created Message successfully'});
     } catch (error) {

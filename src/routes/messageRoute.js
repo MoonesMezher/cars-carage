@@ -19,7 +19,7 @@ router.get('/not-read/page/:page', [requireAuth, validatePageParameter], showAll
 router.get('/:id', [requireAuth, validateObjectId], showMessage)
 
 // POST
-router.post('/create',  createMessage);
+router.post('/create/:id', validateObjectId,  createMessage);
 
 // PUT
 router.put('/mark-as-read/:id', requireAuth, markAsRead);

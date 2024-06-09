@@ -1,6 +1,11 @@
 const { Schema, model, mongoose } = require('mongoose');
 
 const Message = model("Message", new Schema({
+    car_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Car',
+        required: true
+    },
     name: {
         type: String,
         required: true,
