@@ -2,6 +2,7 @@ const Car = require("../database/models/Car");
 const carSchema = require("../validation/carValidation");
 
 const normalizePath = require("../helpers/normalizePathName");
+const handleDateChange = require("../helpers/checkFromDateValue");
 
 const limit = 50;
 
@@ -48,6 +49,34 @@ const showCars = async (req, res) => {
         const cars = await Car.find({}).skip((page - 1) * limit).limit(limit);
 
         return res.status(200).send({ state: 'success', message: 'Get cars successfully', cars: cars, total: count });
+    } catch (error) {
+        return res.status(400).send({ state: 'failed', message: error.message });        
+    }
+}
+
+const showAvailableCars = async (req, res) => {
+    const { page } = req.params;
+
+    try {
+        const count = await Car.countDocuments({ available: true });
+
+        const cars = await Car.find({ available: true }).skip((page - 1) * limit).limit(limit);
+
+        return res.status(200).send({ state: 'success', message: 'Get all available cars successfully', cars: cars, total: count });
+    } catch (error) {
+        return res.status(400).send({ state: 'failed', message: error.message });        
+    }
+}
+
+const showNotAvailableCars = async (req, res) => {
+    const { page } = req.params;
+
+    try {
+        const count = await Car.countDocuments({ available: false });
+
+        const cars = await Car.find({ available: false }).skip((page - 1) * limit).limit(limit);
+
+        return res.status(200).send({ state: 'success', message: 'Get all available cars successfully', cars: cars, total: count });
     } catch (error) {
         return res.status(400).send({ state: 'failed', message: error.message });        
     }
@@ -598,6 +627,67 @@ const deleteCar = async (req, res) => {
     }
 }
 
+const makeCarAvailable = async (req, res) => {
+    const { id } = req.params;
+
+    const car = await Car.findById(id);
+
+    if(!car) {
+        return res.status(400).send({ state: 'failed', message: 'This car is already not exist'});
+    }
+
+    try {
+        await Car.findByIdAndUpdate(id, { available: true, availabilityEndDate: null, availabilityStartDate: null });
+
+        return res.status(200).send({ state: 'success', message: 'This car become available successfully'});        
+    } catch (error) {
+        return res.status(400).send({ state: 'failed', message: error.message});       
+    }
+}
+
+const makeCarNotAvailable = async (req, res) => {
+    const { id } = req.params;
+
+    
+    const car = await Car.findById(id);
+    
+    if(!car) {
+        return res.status(400).send({ state: 'failed', message: 'This car is already not exist'});
+    }
+
+    const { start, end } = req.body;
+
+    const emptyInputs = [];
+
+    if(!start) {
+        emptyInputs.push("start");
+    }
+
+    if(!end) {
+        emptyInputs.push("end");
+    }
+
+    if(emptyInputs.length > 0) {
+        return res.status(400).send({ state: 'failed', message: 'Start and End fields can not be an embty', emptyInputs });
+    }
+
+    if(!handleDateChange(start).status) {
+        return res.status(400).send({ state: 'failed', message: 'Start date must have a date value', error: handleDateChange(start).message });
+    }
+
+    if(!handleDateChange(end).status) {
+        return res.status(400).send({ state: 'failed', message: 'End date must have a date value', error: handleDateChange(start).message });
+    }
+
+    try {
+        await Car.findByIdAndUpdate(id, { available: false, availabilityEndDate: end, availabilityStartDate: start });
+
+        return res.status(200).send({ state: 'success', message: 'This car become not available successfully'});        
+    } catch (error) {
+        return res.status(400).send({ state: 'failed', message: error.message});       
+    }
+}
+
 module.exports = {
     showCar,
     showCars,
@@ -616,5 +706,9 @@ module.exports = {
     showCategories,
     showCarsByGear,
     showCarsByColor,
-    showCarsByGeneralFilter
+    showCarsByGeneralFilter,
+    showAvailableCars,
+    showNotAvailableCars,
+    makeCarAvailable,
+    makeCarNotAvailable
 }

@@ -3,7 +3,7 @@ const logger = require('morgan')
 
 // Routes
 const userRouter = require('./routes/userRoute');
-const messageRouter = require('./routes/messageRoute');
+const bookingRouter = require('./routes/bookingRoute');
 const carRouter = require('./routes/carRoute');
 
 const app = express();
@@ -13,6 +13,6 @@ app.use(express.json());
 
 app.use('/api/users',userRouter);
 app.use('/api/cars',carRouter);
-app.use('/api/messages',messageRouter);
+app.use('/api/bookings',bookingRouter);
 
 module.exports = app;

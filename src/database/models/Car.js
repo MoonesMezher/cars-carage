@@ -93,6 +93,16 @@ const Car = model("Car", new Schema({
     gear: {
         type: String, 
         required: true
+    },
+    available: {
+        type: Boolean,
+        default: true
+    },
+    availabilityStartDate: {
+        type: String,
+    },
+    availabilityEndDate: {
+        type: String,
     }
 }, { timestamps : true }))
 

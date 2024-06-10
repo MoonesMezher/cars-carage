@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Methods
-const { createCar, updateCar, deleteCar, showCar, showCars, showCarsByName, showCarsByCategory, showCarsBySpeed, showCarsByHorse, showCarsByModel, showCarsByPrice, showCarsBySeatNumber, showBrands, showCategories, showCarsByGeneralFilter, showCarsByColor, showCarsByGear, showCarsByBrand } = require('../controllers/carController');
+const { createCar, updateCar, deleteCar, showCar, showCars, showCarsByName, showCarsByCategory, showCarsBySpeed, showCarsByHorse, showCarsByModel, showCarsByPrice, showCarsBySeatNumber, showBrands, showCategories, showCarsByGeneralFilter, showCarsByColor, showCarsByGear, showCarsByBrand, showNotAvailableCars, showAvailableCars, makeCarAvailable, makeCarNotAvailable } = require('../controllers/carController');
 
 // Middlewares
 const requireAuth = require('../middlewares/requireAuth');
@@ -16,6 +16,10 @@ const { upload, uploadImage, uploadImageWhenUpdate } = require('../middlewares/c
 router.get('/page/:page', validatePageParameter, showCars);
 
 router.get('/brands/:language',showBrands);
+
+router.get('/available/page/:page', validatePageParameter, showAvailableCars);
+
+router.get('/not-available/page/:page', [requireAuth ,validatePageParameter], showNotAvailableCars);
 
 router.get('/categories/:language',showCategories);
 
@@ -48,6 +52,10 @@ router.post('/create', [requireAuth, upload.array("pictures"), uploadImage] ,cre
 
 // PUT
 router.put('/update/:id', [validateObjectId ,requireAuth, upload.array("pictures"), uploadImageWhenUpdate] ,updateCar);
+
+router.put('/make-available/:id', [validateObjectId ,requireAuth] ,makeCarAvailable);
+
+router.put('/make-not-available/:id', [validateObjectId ,requireAuth] ,makeCarNotAvailable);
 
 // DELETE
 router.delete('/delete/:id', [validateObjectId ,requireAuth] ,deleteCar);
