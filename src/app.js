@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = require('morgan')
+const cors = require('cors')
 
 // Routes
 const userRouter = require('./routes/userRoute');
@@ -9,6 +10,11 @@ const brandRouter = require('./routes/brandRoute');
 
 const app = express();
 
+const corsOptions = {
+    origin: ['http://localhost:5500', 'http://localhost:3000']
+};
+
+app.use(cors({}))
 app.use(logger('dev'));
 app.use(express.json());
 
