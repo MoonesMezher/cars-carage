@@ -2,16 +2,7 @@ const { Schema, model, default: mongoose } = require("mongoose");
 
 const Car = model("Car", new Schema({
     name: {
-        type: {
-            AR: {
-                type: String,
-                required: true
-            },
-            EN: {
-                type: String,
-                required: true
-            },
-        },
+        type: String,
         required: true
     },
     brand: {

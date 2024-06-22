@@ -32,7 +32,7 @@ const loginAdmin = async (req, res) => {
     let user = await User.findOne({email}); 
     
     if(!user) {
-        return res.status(400).json({state: "failed", message: 'Incorrect name & email'})
+        return res.status(400).json({state: "failed", message: 'Incorrect email'})
     }
 
     const match = passwordHash.verify(password, user.password);

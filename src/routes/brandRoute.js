@@ -9,9 +9,9 @@ const validateObjectId = require('../middlewares/checkFromIdMiddleware');
 const { upload, uploadImage, uploadImageWhenUpdate } = require('../middlewares/checkFromImageMiddleware');
 
 // GET
-router.get('/', showBrands );
+router.get('/', showBrands);
 
-router.get('/:id', validateObjectId, showBrand );
+router.get('/:id', validateObjectId, showBrand);
 
 
 // POST

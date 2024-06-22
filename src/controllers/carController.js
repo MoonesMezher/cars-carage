@@ -18,13 +18,10 @@ const showCar = async (req, res) => {
 
     const filter = {
         $or: [
-            { brand: {
-                EN: car.brand.EN,
-                }
-            },
+            { brand:  car.brand },
             {
             category: {
-                EN: car.category.EN,
+                    EN: car.category.EN,
                 }
             },
             {
@@ -97,19 +94,13 @@ const showCarsByName = async (req, res) => {
     try {
         const regex = new RegExp(`.*${name}.*`, 'i');
 
-        const count = await Car.countDocuments({
-            $or: [
-                { 'name.AR': { $regex: regex} },
-                { 'name.EN': { $regex: regex} }
-            ]
-        });
+        const count = await Car.countDocuments(
+                { 'name': { $regex: regex} },
+        );
 
-        const cars = await Car.find({
-            $or: [
+        const cars = await Car.find(
                 { 'name.AR': { $regex: regex} },
-                { 'name.EN': { $regex: regex} }
-            ]
-        }).skip((page - 1) * limit).limit(limit);
+        ).skip((page - 1) * limit).limit(limit);
 
         return res.status(200).send({ state: 'success', message: `Get cars has name: ${name} successfully`, cars: cars, total: count });
     } catch (error) {
@@ -383,7 +374,7 @@ const showBrands = async (req, res) => {
     }
 
     try {
-        const brands = await Car.distinct(`brand.${language}`);
+        const brands = await Car.distinct(`brand`);
 
         return res.status(200).send({ state: 'success', message: `Get cars brands successfully`, brands: brands});
     } catch (error) {
@@ -456,7 +447,7 @@ const showCarsByGeneralFilter = async (req, res) => {
 
 const createCar = async (req, res) => {
     let { 
-        name_AR, name_EN, 
+        name, 
         brand, 
         category_AR, category_EN,
         price_monthly, price_weekly, price_dayly,
@@ -482,7 +473,7 @@ const createCar = async (req, res) => {
     });
 
     const { error } = carSchema.validate({
-        name_AR, name_EN, 
+        name, 
         brand, 
         category_AR, category_EN,
         pictures: imgs,
@@ -509,7 +500,7 @@ const createCar = async (req, res) => {
     }
 
     const data = {
-        name: { AR: name_AR, EN: name_EN }, 
+        name, 
         brand, 
         category: { AR: category_AR, EN: category_EN},
         pictures: imgs,
@@ -542,7 +533,7 @@ const updateCar = async (req, res) => {
     }
 
     let { 
-        name_AR, name_EN, 
+        name, 
         brand, 
         category_AR, category_EN,
         price_monthly, price_weekly, price_dayly,
@@ -568,7 +559,7 @@ const updateCar = async (req, res) => {
     });
 
     const { error } = carSchema.validate({
-        name_AR, name_EN, 
+        name, 
         brand, 
         category_AR, category_EN,
         pictures: imgs,
@@ -595,7 +586,7 @@ const updateCar = async (req, res) => {
     }
 
     const data = {
-        name: { AR: name_AR, EN: name_EN }, 
+        name, 
         brand, 
         category: { AR: category_AR, EN: category_EN},
         pictures: imgs,
