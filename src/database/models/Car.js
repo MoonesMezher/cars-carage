@@ -15,16 +15,8 @@ const Car = model("Car", new Schema({
         required: true
     },
     brand: {
-        type: {
-            AR: {
-                type: String,
-                required: true
-            },
-            EN: {
-                type: String,
-                required: true
-            },
-        },
+        type: Schema.Types.ObjectId,
+        ref: 'Brand',
         required: true
     },
     category: {

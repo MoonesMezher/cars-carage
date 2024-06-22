@@ -3,6 +3,7 @@ const carSchema = require("../validation/carValidation");
 
 const normalizePath = require("../helpers/normalizePathName");
 const handleDateChange = require("../helpers/checkFromDateValue");
+const { default: mongoose } = require("mongoose");
 
 const limit = 50;
 
@@ -123,25 +124,17 @@ const showCarsByBrand = async (req, res) => {
         return res.status(400).send({ state: 'failed', message: `You should insert a brand to filter cars` });
     }
 
-    if(typeof brand !== 'string') {
-        return res.status(400).send({ state: 'failed', message: `Brand as attribute must be a string` });
+    if(!mongoose.Types.ObjectId.isValid(brand)) {
+        return res.status(400).send({ state: 'failed', message: `Brand as attribute must be a valid Id` });
     }
 
     try {
-        const regex = new RegExp(`.*${brand}.*`, 'i');
-
         const count = await Car.countDocuments({
-            $or: [
-                { 'brand.AR': { $regex: regex} },
-                { 'brand.EN': { $regex: regex} }
-            ]
+                'brand':  brand,
         });
 
         const cars = await Car.find({
-            $or: [
-                { 'brand.AR': { $regex: regex} },
-                { 'brand.EN': { $regex: regex} }
-            ]
+            'brand':  brand,
         }).skip((page - 1) * limit).limit(limit);
 
         return res.status(200).send({ state: 'success', message: `Get cars has brand: ${brand} successfully`, cars: cars, total: count });
@@ -464,7 +457,7 @@ const showCarsByGeneralFilter = async (req, res) => {
 const createCar = async (req, res) => {
     let { 
         name_AR, name_EN, 
-        brand_AR, brand_EN, 
+        brand, 
         category_AR, category_EN,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
@@ -490,7 +483,7 @@ const createCar = async (req, res) => {
 
     const { error } = carSchema.validate({
         name_AR, name_EN, 
-        brand_AR, brand_EN, 
+        brand, 
         category_AR, category_EN,
         pictures: imgs,
         price_monthly, price_weekly, price_dayly,
@@ -507,9 +500,17 @@ const createCar = async (req, res) => {
         return res.status(400).send({ state: 'failed', message: error.details[0].message });        
     }
 
+    if(!brand) {
+        return res.status(400).send({ state: 'failed', message: `Brand as attribute can not be empty` });
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(brand)) {
+        return res.status(400).send({ state: 'failed', message: `Brand as attribute must be a valid Id` });
+    }
+
     const data = {
         name: { AR: name_AR, EN: name_EN }, 
-        brand: { AR: brand_AR, EN: brand_EN }, 
+        brand, 
         category: { AR: category_AR, EN: category_EN},
         pictures: imgs,
         price: { monthly: price_monthly, weekly: price_weekly, dayly: price_dayly },
@@ -542,7 +543,7 @@ const updateCar = async (req, res) => {
 
     let { 
         name_AR, name_EN, 
-        brand_AR, brand_EN, 
+        brand, 
         category_AR, category_EN,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
@@ -568,7 +569,7 @@ const updateCar = async (req, res) => {
 
     const { error } = carSchema.validate({
         name_AR, name_EN, 
-        brand_AR, brand_EN, 
+        brand, 
         category_AR, category_EN,
         pictures: imgs,
         price_monthly, price_weekly, price_dayly,
@@ -585,9 +586,17 @@ const updateCar = async (req, res) => {
         return res.status(400).send({ state: 'failed', message: error.details[0].message });        
     }
 
+    if(!brand) {
+        return res.status(400).send({ state: 'failed', message: `Brand as attribute can not be empty` });
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(brand)) {
+        return res.status(400).send({ state: 'failed', message: `Brand as attribute must be a valid Id` });
+    }
+
     const data = {
         name: { AR: name_AR, EN: name_EN }, 
-        brand: { AR: brand_AR, EN: brand_EN }, 
+        brand, 
         category: { AR: category_AR, EN: category_EN},
         pictures: imgs,
         price: { monthly: price_monthly, weekly: price_weekly, dayly: price_dayly },

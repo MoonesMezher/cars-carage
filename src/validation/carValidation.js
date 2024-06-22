@@ -3,8 +3,6 @@ const Joi = require("joi");
 const carSchema = Joi.object().keys({
     name_AR: Joi.string().required(),
     name_EN: Joi.string().required(),
-    brand_AR: Joi.string().required(),
-    brand_EN: Joi.string().required(),
     category_AR: Joi.string().required(),
     category_EN: Joi.string().required(),
     pictures: Joi.array().items(Joi.string()).required(),
