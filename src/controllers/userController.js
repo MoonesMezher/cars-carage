@@ -7,29 +7,29 @@ const userSchema = require('../validation/userValidation');
 
 const env = process.env;
 
-const createToken = (id, email, name) => {
-    return jwt.sign({id, email, name},env.JWT_SECRET_KEY);
+const createToken = (id, email) => {
+    return jwt.sign({id, email},env.JWT_SECRET_KEY);
 }
 
 // log in user
 const loginAdmin = async (req, res) => {    
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
-    const { error } = userSchema.validate({name, email, password});
+    const { error } = userSchema.validate({email, password});
 
     if(error) {
         return res.status(400).json({state: "failed", message: error.details[0].message})
     }
 
-    let admin = await User.findOne({name: process.env.ADMIN_NAME, email: process.env.ADMIN_EMAIL}); 
+    let admin = await User.findOne({email: process.env.ADMIN_EMAIL}); 
 
     if(!admin) {
         const hash = passwordHash.generate(process.env.ADMIN_PASSWORD);
 
-        admin = await User.create({name: process.env.ADMIN_NAME, email: process.env.ADMIN_EMAIL, password: hash}); 
+        admin = await User.create({email: process.env.ADMIN_EMAIL, password: hash}); 
     }
 
-    let user = await User.findOne({name, email}); 
+    let user = await User.findOne({email}); 
     
     if(!user) {
         return res.status(400).json({state: "failed", message: 'Incorrect name & email'})
@@ -42,7 +42,7 @@ const loginAdmin = async (req, res) => {
     }
 
     try {
-        const token = createToken(user._id, user.email, user.name);
+        const token = createToken(user._id, user.email);
 
         res.status(200).json({state: "success", message: "Logged in successfully", token});
     } catch (error) {
