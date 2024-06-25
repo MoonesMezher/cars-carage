@@ -67,9 +67,14 @@ const showAllBookings = async (req, res) => {
     try {
         const total = await Book.countDocuments({});
 
-        const messages = await Book.find({}).skip((page - 1) * limit).limit(limit);
+        const messages = await Book.find({}).skip((page - 1) * limit).limit(limit).lean();
 
-        return res.status(200).send({ state: 'success', message: 'Get all bookings successfully', messages, total});
+        const response = messages.map(async (message) => {
+            const car = await Car.findById(message.car_id);
+            return {...message, car: car };
+        })
+
+        return res.status(200).send({ state: 'success', message: 'Get all bookings successfully', messages: response, total});
     } catch (error) {
         return res.status(400).send({ state: 'failed', message: error.message});
     }

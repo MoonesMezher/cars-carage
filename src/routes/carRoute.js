@@ -48,10 +48,10 @@ router.get('/by-gear/:gear/page/:page', validatePageParameter ,showCarsByGear);
 router.get('/by-color/:color/page/:page', validatePageParameter ,showCarsByColor);
 
 // POST
-router.post('/create', [requireAuth, upload.array("pictures"), uploadImage] ,createCar);
+router.post('/create', [requireAuth] ,createCar);
 
 // PUT
-router.put('/update/:id', [validateObjectId ,requireAuth, upload.array("pictures"), uploadImageWhenUpdate] ,updateCar);
+router.put('/update/:id', [validateObjectId ,requireAuth] ,updateCar);
 
 router.put('/make-available/:id', [validateObjectId ,requireAuth] ,makeCarAvailable);
 

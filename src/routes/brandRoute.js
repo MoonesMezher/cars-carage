@@ -15,10 +15,10 @@ router.get('/:id', validateObjectId, showBrand);
 
 
 // POST
-router.post('/create',  [requireAuth, upload.single('picture'), uploadImage], createBrand);
+router.post('/create',  [requireAuth], createBrand);
 
 // PUT
-router.put('/update/:id', [requireAuth, validateObjectId,  upload.single('picture'), uploadImageWhenUpdate] ,updateBrand);
+router.put('/update/:id', [requireAuth, validateObjectId] ,updateBrand);
 
 // DELETE   
 router.delete('/delete/:id', [requireAuth, validateObjectId] ,deleteBrand);

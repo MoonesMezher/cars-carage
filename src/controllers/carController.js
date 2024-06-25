@@ -4,6 +4,7 @@ const carSchema = require("../validation/carValidation");
 const normalizePath = require("../helpers/normalizePathName");
 const handleDateChange = require("../helpers/checkFromDateValue");
 const { default: mongoose } = require("mongoose");
+const Brand = require("../database/models/Brand");
 
 const limit = 50;
 
@@ -20,9 +21,7 @@ const showCar = async (req, res) => {
         $or: [
             { brand:  car.brand },
             {
-            category: {
-                    EN: car.category.EN,
-                }
+                category: car.category
             },
             {
                 gear: car.gear
@@ -99,7 +98,7 @@ const showCarsByName = async (req, res) => {
         );
 
         const cars = await Car.find(
-                { 'name.AR': { $regex: regex} },
+                { 'name': { $regex: regex} },
         ).skip((page - 1) * limit).limit(limit);
 
         return res.status(200).send({ state: 'success', message: `Get cars has name: ${name} successfully`, cars: cars, total: count });
@@ -150,15 +149,13 @@ const showCarsByCategory = async (req, res) => {
 
         const count = await Car.countDocuments({
             $or: [
-                { 'category.AR': { $regex: regex} },
-                { 'category.EN': { $regex: regex} }
+                { 'category': { $regex: regex} },
             ]
         });
 
         const cars = await Car.find({
             $or: [
-                { 'category.AR': { $regex: regex} },
-                { 'category.EN': { $regex: regex} }
+                { 'category': { $regex: regex} },
             ]
         }).skip((page - 1) * limit).limit(limit);
 
@@ -349,11 +346,11 @@ const showCarsByColor = async (req, res) => {
 
     try {
         const count = await Car.countDocuments({ 
-            'colors': { $in: color }
+            'color': { $in: color }
         });
 
         const cars = await Car.find({ 
-            'colors': { $in: color }
+            'color': { $in: color }
         }).skip((page - 1) * limit).limit(limit);
 
         return res.status(200).send({ state: 'success', message: `Get cars has color: ${color} successfully`, cars: cars, total: count });
@@ -449,7 +446,7 @@ const createCar = async (req, res) => {
     let { 
         name, 
         brand, 
-        category_AR, category_EN,
+        category,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
         horse,
@@ -457,25 +454,20 @@ const createCar = async (req, res) => {
         seat_number,
         top_speed,
         gear,
-        colors
+        color,
+        pictures
     } = req.body;
 
-    const files = req.files
+    let imgs= [];
 
-    if(!files) {
-        return res.status(400).send({ state: 'failed', message: 'You must insert a files as pictures' });        
-    }
-    const imgs = [];
-
-    files.forEach(file => {
+    pictures.forEach(file => {
         let path = normalizePath(file);
         imgs.push(path);
     });
 
     const { error } = carSchema.validate({
         name, 
-        brand, 
-        category_AR, category_EN,
+        category,
         pictures: imgs,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
@@ -484,7 +476,7 @@ const createCar = async (req, res) => {
         seat_number,
         top_speed,
         gear,
-        colors
+        color
     });
 
     if(error) {
@@ -502,7 +494,7 @@ const createCar = async (req, res) => {
     const data = {
         name, 
         brand, 
-        category: { AR: category_AR, EN: category_EN},
+        category,
         pictures: imgs,
         price: { monthly: price_monthly, weekly: price_weekly, dayly: price_dayly },
         description: { AR: description_AR, EN: description_EN },
@@ -511,10 +503,12 @@ const createCar = async (req, res) => {
         seatNumber: seat_number,
         topSpeed: top_speed,
         gear,
-        colors
+        color
     }
 
+    console.log(data);
     try {
+        console.log(1);
         await Car.create(data);
 
         return res.status(200).send({ state: 'success', message: `Created car successfully`});
@@ -535,7 +529,7 @@ const updateCar = async (req, res) => {
     let { 
         name, 
         brand, 
-        category_AR, category_EN,
+        category,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
         horse,
@@ -543,25 +537,20 @@ const updateCar = async (req, res) => {
         seat_number,
         top_speed,
         gear,
-        colors
+        color,
+        pictures
     } = req.body;
 
-    const files = req.files
-
-    if(!files) {
-        return res.status(400).send({ state: 'failed', message: 'You must insert a files as pictures' });        
-    }
     const imgs = [];
 
-    files.forEach(file => {
+    pictures.forEach(file => {
         let path = normalizePath(file);
         imgs.push(path);
     });
 
     const { error } = carSchema.validate({
         name, 
-        brand, 
-        category_AR, category_EN,
+        category,
         pictures: imgs,
         price_monthly, price_weekly, price_dayly,
         description_AR, description_EN,
@@ -570,7 +559,7 @@ const updateCar = async (req, res) => {
         seat_number,
         top_speed,
         gear,
-        colors
+        color
     });
 
     if(error) {
@@ -588,7 +577,7 @@ const updateCar = async (req, res) => {
     const data = {
         name, 
         brand, 
-        category: { AR: category_AR, EN: category_EN},
+        category,
         pictures: imgs,
         price: { monthly: price_monthly, weekly: price_weekly, dayly: price_dayly },
         description: { AR: description_AR, EN: description_EN },
@@ -597,7 +586,7 @@ const updateCar = async (req, res) => {
         seatNumber: seat_number,
         topSpeed: top_speed,
         gear,
-        colors
+        color
     }
 
     try {

@@ -11,16 +11,7 @@ const Car = model("Car", new Schema({
         required: true
     },
     category: {
-        type: {
-            AR: {
-                type: String,
-                required: true
-            },
-            EN: {
-                type: String,
-                required: true
-            },
-        },
+        type: String,
         required: true
     },
     pictures: {
@@ -66,11 +57,11 @@ const Car = model("Car", new Schema({
         required: true
     },
     topSpeed: {
-        type: String, 
+        type: Number, 
         required: true
     },
-    colors: {
-        type: [String],
+    color: {
+        type: String,
         required: true
     },
     gear: {

@@ -2,10 +2,9 @@ const Joi = require("joi");
 
 const carSchema = Joi.object().keys({
     name: Joi.string().required(),
-    category_AR: Joi.string().required(),
-    category_EN: Joi.string().required(),
+    category: Joi.string().required(),
     pictures: Joi.array().items(Joi.string()).required(),
-    colors: Joi.array().items(Joi.string()).required(),
+    color: Joi.string().required(),
     price_dayly: Joi.string().required(),
     price_weekly: Joi.string().required(),
     price_monthly: Joi.string().required(),
