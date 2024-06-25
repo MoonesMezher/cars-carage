@@ -10,7 +10,8 @@ const {
     createBook,
     markAsRead,
     acceptBooking,
-    rejectBooking
+    rejectBooking,
+    deleteBooking
 } = require('../controllers/bookingController');
 
 const requireAuth = require('../middlewares/requireAuth');
@@ -35,5 +36,8 @@ router.put('/mark-as-read/:id', [requireAuth, validateObjectId], markAsRead);
 router.put('/accept/:id',  [requireAuth, validateObjectId], acceptBooking);
 
 router.put('/reject/:id',  [requireAuth, validateObjectId], rejectBooking);
+
+// DELETE 
+router.delete('/delete/:id',  [requireAuth, validateObjectId], deleteBooking);
 
 module.exports = router;

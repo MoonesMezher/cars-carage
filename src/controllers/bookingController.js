@@ -69,10 +69,12 @@ const showAllBookings = async (req, res) => {
 
         const messages = await Book.find({}).skip((page - 1) * limit).limit(limit).lean();
 
-        const response = messages.map(async (message) => {
+        console.log(messages)
+
+        const response = await Promise.all(messages.map(async (message) => {
             const car = await Car.findById(message.car_id);
             return {...message, car: car };
-        })
+        }))
 
         return res.status(200).send({ state: 'success', message: 'Get all bookings successfully', messages: response, total});
     } catch (error) {
@@ -138,7 +140,7 @@ const acceptBooking = async (req, res) => {
         await booking.save();
 
         try {
-            await Car.findByIdAndUpdate(booking.car_id, { available: false, availabilityStartDate: booking.start,availabilityEndDate: booking.end });
+            await Car.findByIdAndUpdate(booking.car_id, { availabilityStartDate: booking.start, availabilityEndDate: booking.end });
             
             return res.status(200).send({ state: 'success', message: 'Accepted this booking successfully'});            
         } catch (error) {
@@ -168,6 +170,24 @@ const rejectBooking = async (req, res) => {
     }
 };
 
+const deleteBooking = async (req, res) => {
+    const { id } = req.params;
+
+    const booking = await Book.findById(id);
+
+    if(!booking) {
+        return res.status(400).send({ state: 'failed', message: 'This booking deos not exist'});
+    }
+
+    try {
+        await Book.findByIdAndDelete(id);
+        
+        return res.status(200).send({ state: 'success', message: 'Deleted this booking successfully'});            
+    } catch (error) {
+        return res.status(400).send({ state: 'failed', message: error.message});            
+    }
+}
+
 module.exports = {
     showAllBookings,
     showAllNotReadedBookings,
@@ -176,5 +196,6 @@ module.exports = {
     createBook,
     markAsRead,
     acceptBooking,
-    rejectBooking
+    rejectBooking,
+    deleteBooking
 }

@@ -3,15 +3,13 @@ const normalizePath = require("../helpers/normalizePathName");
 const brandSchema = require("../validation/brandValidation");
 
 const createBrand = async (req, res) => {
-    const { name } = req.body;
+    const { name, picture } = req.body;
 
-    const file = req.file
-
-    if(!file) {
-        return res.status(400).send({ state: 'failed', message: 'You must insert a file as picture' });        
+    if(!picture) {
+        return res.status(400).send({ state: 'failed', message: 'You must insert a picture' });        
     }
 
-    let path = normalizePath(file);  
+    let path = normalizePath(picture);  
 
     const { error } = brandSchema.validate({
         name,

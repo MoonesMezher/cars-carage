@@ -5,8 +5,6 @@ const NOW = new Date();
 
 const byEndDate = async () => {
     const cars = await Car.find({ available: false, availabilityEndDate: { $gt: NOW.getTime() } });
-
-    console.log(NOW, 'end');
     
     cars.forEach(async (car) => {
         car.available = true;
@@ -19,8 +17,6 @@ const byEndDate = async () => {
 
 const byStartDate = async () => {
     const cars = await Car.find({ available: true, availabilityStartDate: { $lt: NOW.getTime() } });
-
-    console.log(NOW, 'start');
     
     cars.forEach(async (car) => {
         car.available = false;
